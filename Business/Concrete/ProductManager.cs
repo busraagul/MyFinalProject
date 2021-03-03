@@ -52,7 +52,7 @@ namespace Business.Concrete
             return new SuccessResult(Messages.ProductAdded);
    
         }
-
+        [CasheAspect] //key,value
         public IDataResult<List<Product>> GetAll()
         {
             if (DateTime.Now.Hour == 01)
@@ -97,7 +97,7 @@ namespace Business.Concrete
         private IResult CheckIfProductCountOfCategoryCorrect(int categoryId)
         {
             var result = _productDal.GetAll(p => p.CategoryId == categoryId).Count;
-            if (result >= 10)
+            if (result >= 20)
             {
                 return new ErrorResult(Messages.ProductCountOfCategoryError);
             }
