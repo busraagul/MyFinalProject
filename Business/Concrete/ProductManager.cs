@@ -4,6 +4,7 @@ using Business.CCS;
 using Business.Constans;
 using Business.ValidationRules.FluentValidation;
 using Core.Aspects.Autofac.Validation;
+using Core.Aspects.Caching;
 using Core.CrossCuttingConcerns.Validation;
 using Core.Utilities.Business;
 using Core.Utilities.Results;
@@ -15,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+
 
 namespace Business.Concrete
 {
@@ -32,6 +34,7 @@ namespace Business.Concrete
 
         [SecuredOperation("product.add,admin")]
         [ValidationAspect(typeof(ProductValidator))]
+        [CacheRemoveAspect("IProductService.Get")]
         public IResult Add(Product product)
         {
 
@@ -52,7 +55,7 @@ namespace Business.Concrete
             return new SuccessResult(Messages.ProductAdded);
    
         }
-        [CasheAspect] //key,value
+        [CacheAspect] //key,value
         public IDataResult<List<Product>> GetAll()
         {
             if (DateTime.Now.Hour == 01)
@@ -72,7 +75,7 @@ namespace Business.Concrete
         {
             return new SuccessDataResult<List<Product>>(_productDal.GetAll(p => p.UnitPrice <= min && p.UnitPrice <= max));
         }
-
+        [CacheAspect]
         public IDataResult<Product> GetById(int productId)
         {
             return new SuccessDataResult<Product>(_productDal.Get(p => p.ProductId == productId));
@@ -84,6 +87,7 @@ namespace Business.Concrete
 
         }
         [ValidationAspect(typeof(ProductValidator))]
+        [CacheRemoveAspect("IProductService.Get")]
         public IResult Update(Product product)
         {
             var result = _productDal.GetAll(p => p.CategoryId == product.CategoryId).Count;
